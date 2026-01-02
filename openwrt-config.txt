@@ -1,0 +1,58 @@
+opkg update
+opkg install https-dns-proxy
+
+cat << 'EOF' > /etc/config/https-dns-proxy
+config main 'config'
+        option update_dnsmasq_config '*'
+        option force_dns '0'
+
+config https-dns-proxy
+        option bootstrap_dns '1.1.1.1,9.9.9.9'
+        option resolver_url 'https://security.cloudflare-dns.com/dns-query'
+        option listen_addr '127.0.0.1'
+        option listen_port '5053'
+EOF
+
+uci set dhcp.@dnsmasq[0].noresolv='1'
+
+uci -q delete dhcp.@dnsmasq[0].server
+uci -q delete dhcp.@dnsmasq[0].doh_server
+uci -q delete dhcp.@dnsmasq[0].doh_backup_server
+
+uci add_list dhcp.@dnsmasq[0].server='/mask.icloud.com/'
+uci add_list dhcp.@dnsmasq[0].server='/mask-h2.icloud.com/'
+uci add_list dhcp.@dnsmasq[0].server='/use-application-dns.net/'
+uci add_list dhcp.@dnsmasq[0].server='127.0.0.1#5053'
+uci add_list dhcp.@dnsmasq[0].server='127.0.0.1#5054'
+
+uci add_list dhcp.@dnsmasq[0].doh_server='127.0.0.1#5053'
+uci add_list dhcp.@dnsmasq[0].doh_server='127.0.0.1#5054'
+
+uci add_list dhcp.@dnsmasq[0].doh_backup_server='/mask.icloud.com/'
+uci add_list dhcp.@dnsmasq[0].doh_backup_server='/mask-h2.icloud.com/'
+uci add_list dhcp.@dnsmasq[0].doh_backup_server='/use-application-dns.net/'
+uci add_list dhcp.@dnsmasq[0].doh_backup_server='127.0.0.1#5053'
+uci add_list dhcp.@dnsmasq[0].doh_backup_server='127.0.0.1#5054'
+
+uci commit dhcp
+
+uci add firewall rule
+uci set firewall.@rule[-1].name='DNS-LOCK-NORMAL'
+uci set firewall.@rule[-1].src='lan'
+uci set firewall.@rule[-1].dest='wan'
+uci set firewall.@rule[-1].proto='tcp udp'
+uci set firewall.@rule[-1].dest_port='53'
+uci set firewall.@rule[-1].target='REJECT'
+uci commit firewall
+
+/etc/init.d/https-dns-proxy restart
+/etc/init.d/dnsmasq restart
+/etc/init.d/firewall restart
+
+netstat -tulpn | grep 5053
+logread | grep -i "using nameserver"
+uci get dhcp.@dnsmasq[0].noresolv
+nslookup google.com 127.0.0.1
+ip a show wan
+ip route | head
+ping -c 1 1.1.1.1
