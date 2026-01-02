@@ -1,4 +1,3 @@
-# DNS-OVER-HTTPS-OpenWRT
 # OpenWrt DNS-over-HTTPS Configuration
 
 This repository contains a simple and reproducible configuration file for enabling **DNS-over-HTTPS (DoH)** on an OpenWrt router.
@@ -29,13 +28,12 @@ This setup is useful if you want to:
 
 - This configuration does **not** include a VPN.
 - It focuses only on DNS encryption.
-- Tested on modern OpenWrt releases.
-
+- Tested on **OpenWrt 24.10.5 (r29087-d9c5716d1d)**
+  LuCI: **openwrt-24.10 branch (25.340.26705~d88390b)**
 ## File structure
 
 - `openwrt-config.txt` — DNS-over-HTTPS configuration commands
 - `README.md` — Project documentation
 
 ## Screenshot / Reference
-
-See the image below for a reference or context of the setup
+![OpenWrt DNS-over-HTTPS](Screenshot_20260101_230552.png)
