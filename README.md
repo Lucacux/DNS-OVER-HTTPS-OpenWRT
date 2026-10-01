@@ -33,6 +33,7 @@ This setup is useful if you want to:
 ## File structure
 
 - `openwrt-config.txt` — DNS-over-HTTPS configuration commands
+- `TROUBLESHOOTING.md` — post-mortem of a full DNS outage after the 25.12 upgrade (adblock-fast crashing a jailed dnsmasq + a wedged `https-dns-proxy`) and the fix
 - `README.md` — Project documentation
 
 ## Screenshot / Reference
